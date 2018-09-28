@@ -1,0 +1,109 @@
+Ejemplos GSL:
+
+/* *************** EJEMPLO SIMULACION DE UNA DISTRIBUCION ******************** */
+#include <stdio.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+
+int
+main (void)
+{
+  const gsl_rng_type * T;
+  gsl_rng * r;
+
+  int i, n = 10;
+  double mu = 3.0;
+
+  /* create a generator chosen by the 
+     environment variable GSL_RNG_TYPE */
+
+  gsl_rng_env_setup();
+
+  T = gsl_rng_default;
+  r = gsl_rng_alloc (T);
+
+  /* print n random variates chosen from 
+     the poisson distribution with mean 
+     parameter mu */
+
+  for (i = 0; i < n; i++) 
+    {
+      unsigned int k = gsl_ran_poisson (r, mu);
+      printf(" %u", k);
+    }
+
+  printf("\n");
+  return 0;
+}
+
+/* *************** EJEMPLO USO DE MATRICES ******************** */
+
+8.4.13 Example programs for matrices
+The program below shows how to allocate, initialize and read from a matrix using the functions gsl_matrix_alloc, gsl_matrix_set and gsl_matrix_get.
+
+#include <stdio.h>
+#include <gsl/gsl_matrix.h>
+
+int
+main (void)
+{
+  int i, j; 
+  gsl_matrix * m = gsl_matrix_alloc (10, 3);
+  
+  for (i = 0; i < 10; i++)
+    for (j = 0; j < 3; j++)
+      gsl_matrix_set (m, i, j, 0.23 + 100*i + j);
+  
+  for (i = 0; i < 100; i++)  /* OUT OF RANGE ERROR */
+    for (j = 0; j < 3; j++)
+      printf ("m(%d,%d) = %g\n", i, j, 
+              gsl_matrix_get (m, i, j));
+
+  gsl_matrix_free (m);
+
+  return 0;
+}
+
+/* *************** EJEMPLO USO DE VECTORES ******************** */
+
+8.3.11 Example programs for vectors
+This program shows how to allocate, initialize and read from a vector using the functions gsl_vector_alloc, gsl_vector_set and gsl_vector_get.
+
+#include <stdio.h>
+#include <gsl/gsl_vector.h>
+
+int
+main (void)
+{
+  int i;
+  gsl_vector * v = gsl_vector_alloc (3);
+  
+  for (i = 0; i < 3; i++)
+    {
+      gsl_vector_set (v, i, 1.23 + i);
+    }
+  
+  for (i = 0; i < 100; i++) /* OUT OF RANGE ERROR */
+    {
+      printf ("v_%d = %g\n", i, gsl_vector_get (v, i));
+    }
+
+  gsl_vector_free (v);
+  return 0;
+}
+
+
+/* ***************************************************** */
+
+/* ************** SIMULACION DE GAUSSIANA *********************** */
+Function: double gsl_ran_gaussian (const gsl_rng * r, double sigma)
+  This function returns a Gaussian random variate, with mean zero and standard deviation sigma. 
+
+
+/* ************** FACTORIZACION CHOLESKY *********************** */
+Function: int gsl_linalg_cholesky_decomp1 (gsl_matrix * A)
+This functions factorize the symmetric, positive-definite square matrix A into the Cholesky decomposition A = L L^T (or A = L L^H for the complex case). On input, the values from the diagonal and lower-triangular part of the matrix A are used (the upper triangular part is ignored). On output the diagonal and lower triangular part of the input matrix A contain the matrix L, while the upper triangular part is unmodified. If the matrix is not positive-definite then the decomposition will fail, returning the error code GSL_EDOM.
+
+/* ************** SIMULACION DE GAUSSIANA MULTIVARIADA *********************** */
+Function: int gsl_ran_multivariate_gaussian (const gsl_rng * r, const gsl_vector * mu, const gsl_matrix * L, gsl_vector * result)
+  This function generates a random vector satisfying the k-dimensional multivariate Gaussian distribution with mean \mu and variance-covariance matrix \Sigma. On input, the k-vector \mu is given in mu, and the Cholesky factor of the k-by-k matrix \Sigma = L L^T is given in the lower triangle of L, as output from gsl_linalg_cholesky_decomp. The random vector is stored in result on output. The probability distribution for multivariate Gaussian random variates is
